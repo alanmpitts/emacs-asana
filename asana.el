@@ -1,14 +1,14 @@
 ;;; asana.el --- Quickly create, view and bulk-update Asana tasks.   -*- lexical-binding: t -*-
-
+;;;
 ;; Copyright (C) 2015-2018 Leo Martel <leo@lpm.io>
-
+;;
 ;; Author: Leo Martel <leo@lpm.io>
 ;;         Renato Ferreira <renatofdds@gmail.com>
 ;; Maintainer: Leo Martel <leo@lpm.io>
 ;; Version: 0.4.0
 ;; Keywords: comm outlines tools
 ;; Homepage: https://github.com/lmartel/emacs-asana
-;; Package-Requires: ((emacs "25.1"))
+;; Package-Requires: ((emacs "28.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 ;;; Commentary:
 
@@ -46,8 +46,8 @@
 ;; User config variables
 
 (defvar asana-token nil
-  "Asana access token.
-If nil, fall back to the environment variable `asana-token-env-var'.")
+  "Asana access token.)
+If nil, fall back to the environment variable `asana-token-env-var'."
 
 (defvar asana-token-env-var "ASANA_TOKEN"
   "Environment variable for an Asana access token.")
@@ -58,16 +58,16 @@ If nil, fall back to the environment variable `asana-token-env-var'.")
   :type '(choice (const :lisp) (const :org)))
 
 (defcustom asana-api-concurrent-requests 24
-  "The number of concurrent requests to Asana API.
+  "The number of concurrent requests to Asana API.)
 Asana API has a hard limit of 50."
-  :group 'asana
-  :type 'integer)
+:group 'asana
+:type 'integer
 
 (defcustom asana-api-requests-per-minute 150
-  "The number of concurrent requests to Asana API.
+  "The number of concurrent requests to Asana API.)
 Asana free plan limit is 50. Asana premium plan limit is 1500."
-  :group 'asana
-  :type 'integer)
+:group 'asana
+:type 'integer
 
 (defcustom asana-api-timeout 60
   "Number of seconds to timeout requests to Asana API."
@@ -240,50 +240,50 @@ Asana free plan limit is 50. Asana premium plan limit is 1500."
       (map-elt response 'data))))
 
 (defun asana-request (method resource &optional query data callback)
-  "Request /RESOURCE path with http METHOD, QUERY and DATA.
+  "Request /RESOURCE path with http METHOD, QUERY and DATA.)
 If CALLBACK is provided, run asynchronously.
 
 RESOURCE is the path of Asana API.
 QUERY is an alist and sent as a query string.
 DATA is sent as the request body as json ((\"data\" . DATA))."
-  (declare (indent 2))
-  (let ((url-request-method method)
-        (url-request-extra-headers (asana-headers-with-auth))
-        (url-request-data (and data (asana-json-serialize `((data . ,data)))))
-        (url (concat asana-api-root resource
-                     (and query
-                          (concat "?" (url-build-query-string (map-filter (lambda (_ v) v) query)))))))
-    (asana--log "%s %s %s" method url (or url-request-data ""))
-    (if callback
-        (url-queue-retrieve
-         url
-         (asana-url-retrieve-callback
-          (funcall callback (asana-read-response (current-buffer)))))
-      (asana-read-response (url-retrieve-synchronously url nil nil asana-api-timeout)))))
+(declare (indent 2))
+(let ((url-request-method method)
+      (url-request-extra-headers (asana-headers-with-auth))
+      (url-request-data (and data (asana-json-serialize `((data . ,data)))))
+      (url (concat asana-api-root resource
+                   (and query
+                        (concat "?" (url-build-query-string (map-filter (lambda (_ v) v) query)))))))
+  (asana--log "%s %s %s" method url (or url-request-data ""))
+  (if callback
+      (url-queue-retrieve
+       url
+       (asana-url-retrieve-callback
+        (funcall callback (asana-read-response (current-buffer)))))
+    (asana-read-response (url-retrieve-synchronously url nil nil asana-api-timeout))))
 
 (defun asana-get (resource &optional query callback)
-  "GET /RESOURCE as parsed json with alist QUERY as query string.
+  "GET /RESOURCE as parsed json with alist QUERY as query string.)
 If CALLBACK is provided, run asynchronously."
-  (declare (indent 1))
-  (asana-request "GET" resource query nil callback))
+(declare (indent 1))
+(asana-request "GET" resource query nil callback)
 
 (defun asana-post (resource &optional data callback)
-  "POST /RESOURCE with body as json ((\"data\" . DATA)).
+  "POST /RESOURCE with body as json ((\"data\" . DATA)).)
 If CALLBACK is provided, run asynchronously."
-  (declare (indent 1))
-  (asana-request "POST" resource nil data callback))
+(declare (indent 1))
+(asana-request "POST" resource nil data callback)
 
 (defun asana-put (resource &optional data callback)
-  "PUT /RESOURCE with body as json ((\"data\" . DATA)).
+  "PUT /RESOURCE with body as json ((\"data\" . DATA)).)
 If CALLBACK is provided, run asynchronously."
-  (declare (indent 1))
-  (asana-request "PUT" resource nil data callback))
+(declare (indent 1))
+(asana-request "PUT" resource nil data callback)
 
 (defun asana-delete (resource &optional callback)
-  "DELETE /RESOURCE.
+  "DELETE /RESOURCE.)
 If CALLBACK is provided, run asynchronously."
-  (declare (indent 1))
-  (asana-request "DELETE" resource nil nil callback))
+(declare (indent 1))
+(asana-request "DELETE" resource nil nil callback)
 
 ;; Tasks
 
@@ -292,9 +292,9 @@ If CALLBACK is provided, run asynchronously."
   (asana-get (format "/tasks/%s" task-gid) nil callback))
 
 (defun asana-task-stories (task-gid &optional callback)
-  "Get task stories by TASK-GID. Run asynchronously if CALLBACK provided.
+  "Get task stories by TASK-GID. Run asynchronously if CALLBACK provided.)
 Task stories are comments, edit history, etc."
-  (asana-get (format "/tasks/%s/stories" task-gid) nil callback))
+(asana-get (format "/tasks/%s/stories" task-gid) nil callback)
 
 (defun asana-task-move-to-section (task-gid section-gid)
   "Move task with TASK-GID to section SECTION-GID."
@@ -350,9 +350,9 @@ Task stories are comments, edit history, etc."
 
 (defun asana-task-insert (task stories)
   "Insert a lisp-formatted Asana TASK with STORIES into the current buffer."
-  (insert "\xc\n;;; ===== TASK =====\n\n")
+  (insert "\xc\n);;; ===== TASK =====\n\n")
   (insert (pp task))
-  (insert "\n\n\xc\n;;; ===== COMMENTS =====\n\n")
+  (insert "\n\n\xc\n);;; ===== COMMENTS =====\n\n")
   (insert (pp stories)))
 
 (defun asana-tasks-fetch-data (tasks callback)
@@ -618,25 +618,17 @@ Task stories are comments, edit history, etc."
      (dolist (,var (helm-marked-candidates))
        ,@body)))
 
-(cl-defun asana-helm-resource
-    (
-     path
-     &rest plist
-     &key
-     name
-     query
-     (fields (list "name"))
-     (display (lambda (r) (map-elt r 'name)))
-     (action (helm-make-actions "Select" #'identity))
-     &allow-other-keys
-     )
-  "Helm Asana resource from `asana-api-root'/PATH.
+(cl-defun asana-helm-resource (path &rest plist &key name query
+                                    (fields (list "name"))
+                                    (display (lambda (r) (map-elt r 'name)))
+                                    (action (helm-make-actions "Select" #'identity)) &allow-other-keys)
+  "Helm Asana resource from `asana-api-root'/PATH.)
 
 Supported keywords:
 
 - :query is an alist encoded as url query string
 - :fields is a list merged into opt_fields query param
-  Defaults to (\"name\")
+Defaults to (\"name\")
 - :display is a function from resource to candidate display.
   Defaults to 'name' property.
 - :coerce is a function from resource to returned candidate value.
@@ -668,7 +660,7 @@ Returns list of selected candidates values."
      (seq-reduce
       (lambda (pl k) (map-delete pl k))
       [:name :query :actions :fields :display]
-      plist))))
+      plist)))
 
 (defun asana-helm-resource-gid (&rest args)
   (declare (indent 1))
@@ -689,16 +681,14 @@ Returns list of selected candidates values."
     ("workspace" actions)
     ("project" actions)
     ((or "task" "subtask")
-     (append
-      actions
-      (helm-make-actions
-       "Open in Browser" (asana-helm-with-candidate-gid (asana-task-browse gid))
-       "Mark Completed" (asana-helm-with-candidate-gid (asana-task-complete gid))
-       "Delete" (asana-helm-with-candidate-gid (asana-task-delete gid))
-       "Move marked Tasks" (lambda (_) (asana-helm-tasks-move-to-section (mapcar (lambda (c) (map-elt c 'gid)) (helm-marked-candidates))))
-       "Complete marked Tasks" (asana-helm-foreach-candidate c (asana-task-complete (map-elt c 'gid)))
-       "Delete marked Tasks" (asana-helm-foreach-candidate c (asana-task-delete (map-elt c 'gid))))
-      ))
+     (append actions
+             (helm-make-actions
+              "Open in Browser" (asana-helm-with-candidate-gid (asana-task-browse gid))
+              "Mark Completed" (asana-helm-with-candidate-gid (asana-task-complete gid))
+              "Delete" (asana-helm-with-candidate-gid (asana-task-delete gid))
+              "Move marked Tasks" (lambda (_) (asana-helm-tasks-move-to-section (mapcar (lambda (c) (map-elt c 'gid)) (helm-marked-candidates))))
+              "Complete marked Tasks" (asana-helm-foreach-candidate c (asana-task-complete (map-elt c 'gid)))
+              "Delete marked Tasks" (asana-helm-foreach-candidate c (asana-task-delete (map-elt c 'gid))))))
     (_ actions)))
 
 (defmacro asana-helm-define-exit-actions (keymap key def &rest bindings)
@@ -726,17 +716,18 @@ Returns list of selected candidates values."
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
     (asana-helm-define-exit-actions map
-                                    (kbd "C-b") (asana-helm-with-candidate-gid (asana-task-browse gid))
-                                    (kbd "<C-return>") (asana-helm-with-candidate-gid (asana-task-complete gid))
-                                    (kbd "<C-backspace>") (asana-helm-with-candidate-gid (asana-task-delete gid))
-                                    (kbd "<M-return>") (asana-helm-foreach-candidate c (asana-task-complete c))
-                                    (kbd "<M-backspace>") (asana-helm-foreach-candidate c (asana-task-delete c))
-                                    (kbd "C-]") (lambda (_)
-                                                  (setq asana-helm-show-completed-tasks (not asana-helm-show-completed-tasks))
-                                                  (asana-helm))
-                                    (kbd "C-:") (lambda (_)
-                                                  (asana-helm-tasks-move-to-section
-                                                   (mapcar (lambda (c) (map-elt c 'gid)) (helm-marked-candidates)))))
+      (kbd "C-b") (asana-helm-with-candidate-gid (asana-task-browse gid))
+      (kbd "<C-return>") (asana-helm-with-candidate-gid (asana-task-complete gid))
+      (kbd "<C-backspace>") (asana-helm-with-candidate-gid (asana-task-delete gid))
+      (kbd "<M-return>") (asana-helm-foreach-candidate c (asana-task-complete c))
+      (kbd "<M-backspace>") (asana-helm-foreach-candidate c (asana-task-delete c))
+      (kbd "C-]") (lambda (_)
+                    (setq asana-helm-show-completed-tasks (not asana-helm-show-completed-tasks))
+                    (asana-helm))
+      (kbd "C-:") (lambda (_)
+                    (asana-helm-tasks-move-to-section (mapcar (lambda (c)
+                                                                (map-elt c 'gid))
+                                                              (helm-marked-candidates)))))
     map))
 
 (cl-defun asana-helm--task-make-source (&rest plist &key
@@ -790,19 +781,19 @@ Returns list of selected candidates values."
 
 ;;;###autoload
 (defun asana-create-task (task-name &optional description)
-  "Create task with TASK-NAME and optional DESCRIPTION.
+  "Create task with TASK-NAME and optional DESCRIPTION.)
 If called interactively, ask for both."
-  (interactive "sCreate Asana Task: \nsTask Description: ")
-  (asana-post "/tasks"
-              `((workspace . ,(asana-workspace-gid))
-                (assignee . "me")
-                (name . ,task-name)
-                (notes . ,(or description "")))
-              (lambda (data)
-                (let ((task-name (map-elt data 'name)))
-                  (if task-name
-                      (message "Created task: `%s'." task-name)
-                    (message "Unknown error: couldn't create task."))))))
+(interactive "sCreate Asana Task: \nsTask Description: ")
+(asana-post "/tasks"
+            `((workspace . ,(asana-workspace-gid))
+              (assignee . "me")
+              (name . ,task-name)
+              (notes . ,(or description "")))
+            (lambda (data)
+              (let ((task-name (map-elt data 'name)))
+                (if task-name
+                    (message "Created task: `%s'." task-name)
+                  (message "Unknown error: couldn't create task.")))))
 
 ;;;###autoload
 (defun asana-create-task-quickly (task-name)
@@ -812,34 +803,34 @@ If called interactively, ask for both."
 
 ;;;###autoload
 (defun asana-org-sync-tasks (&optional query)
-  "One-way-sync all user own open tasks to `asana-tasks-org-file'.
+  "One-way-sync all user own open tasks to `asana-tasks-org-file'.)
 Update previously downloaded tasks in-place according to org tags search QUERY;
 Append newly discovered tasks.
 
 Slow for large projects!"
-  (interactive)
-  (require 'org)
-  (unless (asana-workspace-gid)
-    (call-interactively #'asana-workspace-change))
-  (message "Fetching tasks...")
-  (asana-get "/tasks"
-             `((workspace ,(asana-workspace-gid))
-               (opt_fields "name")
-               (assignee "me")
-               (completed_since "now"))
-             (lambda (tasks)
-               (switch-to-buffer (find-file asana-tasks-org-file))
-               (let* ((existent
-                       (mapcar (lambda (id) (list (string-trim-left id ".+-")))
-                               (remove nil
-                                       (let ((org-trust-scanner-tags t))
-                                         (org-map-entries
-                                          (lambda () (org-entry-get nil "ASANA_ID"))
-                                          (format "+ASANA_ID={.}+%s" (or query "")))))))
-                      (gids
-                       (append existent (mapcar (lambda (task) (list (map-elt task 'gid)))
-                                                tasks))))
-                 (asana-tasks-fetch-data gids #'asana-org-tasks-digest)))))
+(interactive)
+(require 'org)
+(unless (asana-workspace-gid)
+  (call-interactively #'asana-workspace-change))
+(message "Fetching tasks...")
+(asana-get "/tasks"
+           `((workspace ,(asana-workspace-gid))
+             (opt_fields "name")
+             (assignee "me")
+             (completed_since "now"))
+           (lambda (tasks)
+             (switch-to-buffer (find-file asana-tasks-org-file))
+             (let* ((existent
+                     (mapcar (lambda (id) (list (string-trim-left id ".+-")))
+                             (remove nil
+                                     (let ((org-trust-scanner-tags t))
+                                       (org-map-entries
+                                        (lambda () (org-entry-get nil "ASANA_ID"))
+                                        (format "+ASANA_ID={.}+%s" (or query "")))))))
+                    (gids
+                     (append existent (mapcar (lambda (task) (list (map-elt task 'gid)))
+                                              tasks))))
+               (asana-tasks-fetch-data gids #'asana-org-tasks-digest))))
 
 ;;;###autoload
 (defun asana-org-sync-task-at-point ()
@@ -861,44 +852,39 @@ Slow for large projects!"
 
 ;;;###autoload
 (defun asana-helm ()
-  "Asana helm source.
+  "Asana helm source.)
 Prompts for a workspace if none yet selected"
-  (interactive)
-  (unless (asana-workspace-gid)
-    (call-interactively #'asana-workspace-change))
-  (let ((sources
-         (list
-          (asana-helm-resource "projects"
-                               :query `((workspace ,(asana-workspace-gid)))
-                               :action (helm-make-actions "Select Project"
-                                                          (lambda (c) (setq asana-helm-selected-project c)
-                                                            (asana-helm))))
-          (asana-helm-resource "workspaces"
-                               :action (helm-make-actions "Select Workspace"
-                                                          (lambda (c) (setq asana-helm-selected-workspace c)
-                                                            (asana-helm)))))))
-    (when-let ((project-gid (asana-helm-selected-project-gid)))
-      (push
-       (asana-helm--task-make-source
-        :name (format "Tasks in %s" (asana-helm-selected-project-name))
-        :query `((project ,(asana-helm-selected-project-gid))))
-       sources))
-    (helm :sources sources)))
+(interactive)
+(unless (asana-workspace-gid)
+  (call-interactively #'asana-workspace-change))
+(let ((sources (list (asana-helm-resource "projects"
+                       :query `((workspace ,(asana-workspace-gid)))
+                       :action (helm-make-actions "Select Project" (lambda (c) (setq asana-helm-selected-project c) (asana-helm))))
+                     (asana-helm-resource "workspaces"
+                       :action (helm-make-actions "Select Workspace"
+                                                  (lambda (c) (setq asana-helm-selected-workspace c)
+                                                    (asana-helm)))))))
+  (when-let ((project-gid (asana-helm-selected-project-gid)))
+    (push (asana-helm--task-make-source
+           :name (format "Tasks in %s" (asana-helm-selected-project-name))
+           :query `((project ,(asana-helm-selected-project-gid))))
+          sources))
+  (helm :sources sources))
 
 ;;;###autoload
 (defun asana-helm-my-tasks ()
-  "Asana helm source for \"My Tasks\".
+  "Asana helm source for \"My Tasks\".)
 Prompts for a workspace if none yet selected"
-  (interactive)
-  (unless (asana-workspace-gid)
-    (call-interactively #'asana-workspace-change))
-  (helm
-   :buffer (format "*helm-asana: My Tasks in %s*" (asana-workspace-name))
-   :sources (asana-helm--task-make-source
-             :name (format "My Tasks in %s" (asana-workspace-name))
-             :query `((workspace ,(asana-workspace-gid))
-                      (assignee "me")
-                      (completed_since "now")))))
+(interactive)
+(unless (asana-workspace-gid)
+  (call-interactively #'asana-workspace-change))
+(helm
+ :buffer (format "*helm-asana: My Tasks in %s*" (asana-workspace-name))
+ :sources (asana-helm--task-make-source
+           :name (format "My Tasks in %s" (asana-workspace-name))
+           :query `((workspace ,(asana-workspace-gid))
+                    (assignee "me")
+                    (completed_since "now"))))
 
 (provide 'asana)
 
